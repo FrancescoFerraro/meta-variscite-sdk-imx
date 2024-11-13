@@ -27,12 +27,7 @@ RDEPENDS:${PN}-devel:append:imxdrm = " \
     libdrm-tests \
 "
 
-RDEPENDS:${PN}-docker:mx8-nxp-bsp = "\
-    docker-moby \
-    python3-docker-compose \
-"
-
-RDEPENDS:${PN}-docker:mx9-nxp-bsp = "\
+RDEPENDS:${PN}-docker = "\
     docker-moby \
     python3-docker-compose \
 "
