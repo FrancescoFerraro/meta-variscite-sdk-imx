@@ -34,3 +34,6 @@ RDEPENDS:${PN} += " \
 	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston-examples', '', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'wifi', 'hostapd', '', d)} \
 "
+
+# openthread should be provided by ot-daemon_git.bb
+RDEPENDS:${PN}:remove = "packagegroup-nxp-openthread"
