@@ -18,6 +18,7 @@ RDEPENDS:${PN}-devel = "\
     openssh-sftp-server \
     screen \
     tcf-agent \
+    devmem2 \
 "
 
 # Only for DRM enabled machines
