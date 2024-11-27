@@ -49,10 +49,15 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 
 CORE_IMAGE_EXTRA_INSTALL:append:mx8-nxp-bsp = "\
     packagegroup-fsl-tools-gpu \
+    packagegroup-variscite-imx-swupdate \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:append:mx95-nxp-bsp = "\
     packagegroup-fsl-tools-gpu \
+"
+
+CORE_IMAGE_EXTRA_INSTALL:append:mx9-nxp-bsp = "\
+    packagegroup-variscite-imx-swupdate \
 "
 
 systemd_disable_vt () {
