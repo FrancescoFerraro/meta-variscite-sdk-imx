@@ -9,6 +9,7 @@ PACKAGES = "\
     ${PN}-docker \
     ${PN}-ml \
     ${PN}-security \
+    ${PN}-swupdate \
 "
 
 RDEPENDS:${PN}-devel = "\
@@ -58,4 +59,9 @@ RDEPENDS:${PN}-security = "\
     keyctl-caam \
     keyutils \
     lvm2 \
+"
+
+RDEPENDS:${PN}-swupdate = "\
+    swupdate \
+    swupdate-www \
 "
