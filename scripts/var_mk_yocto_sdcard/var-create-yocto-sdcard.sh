@@ -217,7 +217,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
 		-s) cal_only=1 ;;
 		-a) AUTO_FILL_SD=1 ;;
 		-d) shift;
-			YOCTO_DEFAULT_IMAGE_MASK_PATH=`readlink -e "${1}.${TARBALL_FMT}"` || handle_file_missing "${1}.${TARBALL_FMT}";
+			YOCTO_DEFAULT_IMAGE_MASK_PATH=`readlink -e "${1}.${TARBALL_BASENAME}.${TARBALL_FMT}"` || handle_file_missing "${1}.${TARBALL_FMT}";
 			YOCTO_DEFAULT_IMAGE_PATH=`dirname ${YOCTO_DEFAULT_IMAGE_MASK_PATH}`
 			YOCTO_DEFAULT_IMAGE_BASE_IN_NAME=`basename ${1}`
 			# If YOCTO_RECOVERY_ROOTFS_MASK_PATH unset, copy the
@@ -228,7 +228,7 @@ while [ "$moreoptions" = 1 -a $# -gt 0 ]; do
 			fi
 		;;
 		-r) shift;
-			YOCTO_RECOVERY_ROOTFS_MASK_PATH=`readlink -e "${1}.${TARBALL_FMT}"` || handle_file_missing "${1}.${TARBALL_FMT}";
+			YOCTO_RECOVERY_ROOTFS_MASK_PATH=`readlink -e "${1}.${TARBALL_BASENAME}.${TARBALL_FMT}"` || handle_file_missing "${1}.${TARBALL_FMT}";
 			YOCTO_RECOVERY_ROOTFS_PATH=`dirname ${YOCTO_RECOVERY_ROOTFS_MASK_PATH}`
 			YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME=`basename ${1}`
 		;;
@@ -385,7 +385,7 @@ function install_yocto
 		echo
 		echo "Installing Yocto Boot partition"
 		for f in ${YOCTO_IMGS_PATH}/*.dtb; do
-			if [[ -L $f ]] && [[ $f != *${MACHINE}.dtb ]]; then
+			if [[ ! -L $f ]]; then
 				cp $f	${P1_MOUNT_DIR}/
 			fi
 		done
@@ -426,7 +426,7 @@ function copy_images
 
 	if [ ${BOOT_ROM_SIZE} != 0 ]; then
 		for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/*.dtb; do
-			if [[ -L $f ]] && [[ $f != *${MACHINE}.dtb ]]; then
+			if [[ ! -L $f ]]; then
 				cp $f	${P2_MOUNT_DIR}/opt/images/Yocto/
 			fi
 		done
@@ -435,8 +435,8 @@ function copy_images
 	fi
 
 	# Copy image for eMMC
-	if [ -f ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.rootfs.${TARBALL_FMT} ]; then
-		pv ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.rootfs.${TARBALL_FMT} > ${P2_MOUNT_DIR}/opt/images/Yocto/${TARBALL_BASENAME}.${TARBALL_FMT}
+	if [ -f ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.${TARBALL_BASENAME}.${TARBALL_FMT} ]; then
+		pv ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.${TARBALL_BASENAME}.${TARBALL_FMT} > ${P2_MOUNT_DIR}/opt/images/Yocto/${TARBALL_BASENAME}.${TARBALL_FMT}
 	else
 		echo "${TARBALL_BASENAME}.${TARBALL_FMT} file is not present. Installation on \"eMMC\" will not be supported."
 	fi
@@ -445,14 +445,14 @@ function copy_images
 		# Configure uboot-fw-utils for SD
 		set_fw_utils_to_sd_on_sd_card
 		# Copy images for NAND flash
-		for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}_*.ubi; do
-			if [ -f "$f" ]; then
-				pv $f > ${P2_MOUNT_DIR}/opt/images/Yocto/`basename $f`
+		for f in ${YOCTO_RECOVERY_ROOTFS_PATH}/${YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME}.${TARBALL_BASENAME}_*.ubi; do
+			if [ -L "$f" ]; then
+				basename=$(basename $f)
+				newname=${basename#$YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME.}
+				pv $f > ${P2_MOUNT_DIR}/opt/images/Yocto/$newname
 			fi
 		done
-		if ls ${P2_MOUNT_DIR}/opt/images/Yocto/*.ubi &> /dev/null; then
-			STR=$YOCTO_RECOVERY_ROOTFS_BASE_IN_NAME rename 's/\Q$ENV{STR}\E/rootfs/' ${P2_MOUNT_DIR}/opt/images/Yocto/*.ubi
-		else
+		if ! ls ${P2_MOUNT_DIR}/opt/images/Yocto/*.ubi &> /dev/null; then
 			echo "UBI rootfs images are not present. Installation on \"NAND flash\" will not be supported."
 		fi
 	fi
