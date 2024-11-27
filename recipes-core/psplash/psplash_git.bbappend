@@ -5,6 +5,8 @@ SRC_URI:append = " \
 "
 SPLASH_IMAGES = "file://psplash-poky.png;outsuffix=default"
 
+CFLAGS:append = " -DPSPLASH_DISABLE_STARTUP_MSG"
+
 do_configure:prepend() {
 	cp ${WORKDIR}/*.png ${S}/base-images
 }
