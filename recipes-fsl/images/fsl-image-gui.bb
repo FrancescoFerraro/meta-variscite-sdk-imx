@@ -18,7 +18,7 @@ IMAGE_FEATURES += " \
     ssh-server-openssh \
     hwcodecs \
     debug-tweaks \
-    nfs-server \
+    nfs-client \
     tools-debug \
     tools-testapps \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston', \
