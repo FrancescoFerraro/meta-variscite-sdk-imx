@@ -40,6 +40,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	packagegroup-variscite-imx-security \
 	${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'packagegroup-variscite-imx-docker', '', d)} \
 	packagegroup-variscite-imx-devel \
+	${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xterm', '', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', 'weston-xwayland', '', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'weston-init', \
