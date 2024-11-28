@@ -15,7 +15,7 @@ inherit core-image
 
 IMAGE_FEATURES += " \
     splash \
-    ssh-server-dropbear \
+    ssh-server-openssh \
     hwcodecs \
     debug-tweaks \
     nfs-server \
