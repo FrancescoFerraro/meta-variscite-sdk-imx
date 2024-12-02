@@ -88,7 +88,7 @@ function check_device()
 		local drive=$(udisksctl info -b /dev/${dev}|grep "Drive:"|cut -d"'" -f 2)
 		local mediaremovable=$(gdbus call --system --dest org.freedesktop.UDisks2 \
 				--object-path ${drive} --method org.freedesktop.DBus.Properties.Get \
-				org.freedesktop.UDisks2.Drive MediaRemovable)
+				org.freedesktop.UDisks2.Drive MediaRemovable 2> /dev/null)
 		if [[ "${mediaremovable}" = *"true"* ]]; then
 			removable=1
 		fi
