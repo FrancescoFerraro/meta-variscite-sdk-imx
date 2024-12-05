@@ -39,7 +39,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 	packagegroup-variscite-imx-ml \
 	packagegroup-variscite-imx-security \
 	${@bb.utils.contains('DISTRO_FEATURES', 'virtualization', 'packagegroup-variscite-imx-docker', '', d)} \
-	packagegroup-variscite-imx-devel \
+	packagegroup-variscite-devel \
 	${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd-analyze', '', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'xterm', '', d)} \
 	${@bb.utils.contains('DISTRO_FEATURES', 'x11 wayland', 'weston-xwayland', '', d)} \
@@ -50,7 +50,7 @@ CORE_IMAGE_EXTRA_INSTALL += " \
 
 CORE_IMAGE_EXTRA_INSTALL:append:mx8-nxp-bsp = "\
     packagegroup-fsl-tools-gpu \
-    packagegroup-variscite-imx-swupdate \
+    packagegroup-variscite-swupdate \
 "
 
 CORE_IMAGE_EXTRA_INSTALL:append:mx95-nxp-bsp = "\
@@ -58,7 +58,7 @@ CORE_IMAGE_EXTRA_INSTALL:append:mx95-nxp-bsp = "\
 "
 
 CORE_IMAGE_EXTRA_INSTALL:append:mx9-nxp-bsp = "\
-    packagegroup-variscite-imx-swupdate \
+    packagegroup-variscite-swupdate \
 "
 
 systemd_disable_vt () {

@@ -5,26 +5,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit packagegroup
 
 PACKAGES = "\
-    ${PN}-devel \
     ${PN}-docker \
     ${PN}-ml \
     ${PN}-security \
-    ${PN}-swupdate \
-"
-
-RDEPENDS:${PN}-devel = "\
-    libgpiod \
-    libgpiod-tools \
-    nodejs \
-    openssh-sftp-server \
-    screen \
-    tcf-agent \
-    devmem2 \
-"
-
-# Only for DRM enabled machines
-RDEPENDS:${PN}-devel:append:imxdrm = " \
-    libdrm-tests \
 "
 
 RDEPENDS:${PN}-docker = "\
@@ -54,9 +37,4 @@ RDEPENDS:${PN}-security = "\
     keyctl-caam \
     keyutils \
     lvm2 \
-"
-
-RDEPENDS:${PN}-swupdate = "\
-    swupdate \
-    swupdate-www \
 "
