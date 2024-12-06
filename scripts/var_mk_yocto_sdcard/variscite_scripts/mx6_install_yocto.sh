@@ -21,11 +21,11 @@ set_fw_env_config_to_sd()
 set_fw_utils_to_sd_on_sd_card()
 {
 	# Adjust u-boot-fw-utils for eMMC on the SD card
-	if [[ `readlink /etc/u-boot-initial-env` != "u-boot-initial-env-sd" ]]; then
+	if [ `readlink /etc/u-boot-initial-env` != "u-boot-initial-env-sd" ]; then
 		ln -sf u-boot-initial-env-sd /etc/u-boot-initial-env
 	fi
 
-	if [[ -f /etc/fw_env.config ]]; then
+	if [ -f /etc/fw_env.config ]; then
 		set_fw_env_config_to_sd /etc/fw_env.config
 	fi
 }
@@ -44,11 +44,11 @@ set_fw_env_config_to_nand()
 set_fw_utils_to_nand_on_sd_card()
 {
 	# Adjust u-boot-fw-utils for NAND flash on the SD card
-	if [[ `readlink /etc/u-boot-initial-env` != "u-boot-initial-env-nand" ]]; then
+	if [ `readlink /etc/u-boot-initial-env` != "u-boot-initial-env-nand" ]; then
 		ln -sf u-boot-initial-env-nand /etc/u-boot-initial-env
 	fi
 
-	if [[ -f /etc/fw_env.config ]]; then
+	if [ -f /etc/fw_env.config ]; then
 		set_fw_env_config_to_nand /etc/fw_env.config
 	fi
 }
@@ -58,12 +58,12 @@ install_bootloader()
 	echo
 	blue_underlined_bold_echo "Installing booloader"
 
-	if [[ ! -f $MEDIA/$UBOOT_IMAGE ]] ; then
+	if [ ! -f $MEDIA/$UBOOT_IMAGE ] ; then
 		red_bold_echo "ERROR: \"$MEDIA/$UBOOT_IMAGE\" does not exist"
 		exit 1
 	fi
 
-	if [[ ! -f $MEDIA/$SPL_IMAGE ]] ; then
+	if [ ! -f $MEDIA/$SPL_IMAGE ] ; then
 		red_bold_echo "ERROR: \"$MEDIA/$SPL_IMAGE\" does not exist"
 		exit 1
 	fi
@@ -74,13 +74,13 @@ install_bootloader()
 	flash_erase /dev/mtd1 0 0 2> /dev/null
 	nandwrite -p /dev/mtd1 $MEDIA/$UBOOT_IMAGE
 
-	if [[ $ROOTFS_DEV == "emmc" ]] ; then
+	if [ "$ROOTFS_DEV" = "emmc" ] ; then
 		echo
 		echo "Setting U-Boot enviroment variables"
 		set_fw_utils_to_nand_on_sd_card
 		fw_setenv rootfs_device emmc  2> /dev/null
 
-		if [[ $swupdate == 1 ]] ; then
+		if [ "$swupdate" = 1 ] ; then
 			fw_setenv mmcrootpart 1
 			fw_setenv boot_device emmc
 			fw_setenv bootdir /boot
@@ -92,7 +92,7 @@ install_bootloader()
 
 install_kernel()
 {
-	if [[ ! -f $MEDIA/$KERNEL_IMAGE ]] ; then
+	if [ ! -f $MEDIA/$KERNEL_IMAGE ] ; then
 		red_bold_echo "ERROR: \"$MEDIA/$KERNEL_IMAGE\" does not exist"
 		exit 1
 	fi
@@ -105,7 +105,7 @@ install_kernel()
 
 install_rootfs_to_nand()
 {
-	if [[ ! -f $MEDIA/$ROOTFS_IMAGE ]] ; then
+	if [ ! -f $MEDIA/$ROOTFS_IMAGE ] ; then
 		red_bold_echo "ERROR: \"$MEDIA/$ROOTFS_IMAGE\" does not exist"
 		exit 1
 	fi
@@ -116,7 +116,7 @@ install_rootfs_to_nand()
 
 install_rootfs()
 {
-	if [[ $ROOTFS_DEV != "emmc" ]] ; then
+	if [ "$ROOTFS_DEV" != "emmc" ] ; then
 		install_rootfs_to_nand
 	else
 		/usr/bin/install_yocto_emmc.sh ${EMMC_EXTRA_ARGS}
@@ -176,13 +176,13 @@ done
 
 STR=""
 
-if [[ $BOARD == "mx6cb" ]] ; then
+if [ "$BOARD" = "mx6cb" ] ; then
 	STR="MX6CustomBoard"
-elif [[ $BOARD == "scb" ]] ; then
+elif [ "$BOARD" = "scb" ] ; then
 	STR="SOLOCustomBoard"
-elif [[ $BOARD == "dart" ]] ; then
+elif [ "$BOARD" = "dart" ] ; then
 	STR="DART-MX6"
-elif [[ $BOARD == "symph" ]] ; then
+elif [ "$BOARD" = "symph" ] ; then
 	STR="SymphonyBoard"
 else
 	usage
@@ -192,18 +192,18 @@ fi
 printf "Carrier board: "
 blue_bold_echo $STR
 
-if [[ $BOARD == "dart" ]] ; then
-	if [[ $swupdate == 1 ]] ; then
+if [ "$BOARD" = "dart" ] ; then
+	if [ "$swupdate" = 1 ] ; then
 		blue_bold_echo "Creating two rootfs partitions"
 	fi
 	/usr/bin/install_yocto_emmc.sh -b dart ${EMMC_EXTRA_ARGS}
 	finish
 fi
 
-if [[ $BOARD == "mx6cb" ]] ; then
-	if [[ $TOUCHSCREEN == "cap" ]] ; then
+if [ "$BOARD" = "mx6cb" ] ; then
+	if [ "$TOUCHSCREEN" = "cap" ] ; then
 		STR="Capacitive"
-	elif [[ $TOUCHSCREEN == "res" ]] ; then
+	elif [ "$TOUCHSCREEN" = "res" ] ; then
 		STR="Resistive"
 	else
 		usage
@@ -213,15 +213,15 @@ if [[ $BOARD == "mx6cb" ]] ; then
 	blue_bold_echo $STR
 fi
 
-if [[ $ROOTFS_DEV == "nand" ]] ; then
+if [ "$ROOTFS_DEV" = "nand" ] ; then
 	STR="NAND"
 	MTD_ERASESIZE=`cat /sys/class/mtd/mtd3/erasesize`
-	if [[ $MTD_ERASESIZE == 131072 ]] ; then
+	if [ "$MTD_ERASESIZE" = 131072 ] ; then
 		ROOTFS_IMAGE=rootfs_128kbpeb.ubi
 	else
 		ROOTFS_IMAGE=rootfs_256kbpeb.ubi
 	fi
-elif [[ $ROOTFS_DEV == "emmc" ]] ; then
+elif [ "$ROOTFS_DEV" = "emmc" ] ; then
 	STR="eMMC"
 else
 	usage
@@ -233,21 +233,21 @@ blue_bold_echo $STR
 
 CPUS=`cat /proc/cpuinfo | grep -c processor`
 
-if [[ $CPUS == 1 ]] || [[ $CPUS == 2 ]] ; then
-	if [[ `dmesg | grep -c SOM-SOLO` == 1 ]] ; then
-		if [[ "$BOARD" == "scb" ]] ; then
+if [ "$CPUS" = 1 ] || [ "$CPUS" = 2 ] ; then
+	if [ `dmesg | grep -c SOM-SOLO` = 1 ] ; then
+		if [ "$BOARD" = "scb" ] ; then
 			KERNEL_DTB=imx6dl-var-som-solo-vsc.dtb
-		elif [[ "$BOARD" == "symph" ]] ; then
+		elif [ "$BOARD" = "symph" ] ; then
 			KERNEL_DTB=imx6dl-var-som-solo-symphony.dtb
 		else
 			KERNEL_DTB=imx6dl-var-som-solo-$TOUCHSCREEN.dtb
 		fi
 	else
-		if [[ $CPUS == 1 ]] || [[ `dmesg | grep -c i.MX6DL` == 1 ]] ; then
+		if [ "$CPUS" = 1 ] || [ `dmesg | grep -c i.MX6DL` = 1 ] ; then
 			# iMX6 Solo/DualLite
-			if [[ $BOARD == "scb" ]] ; then
+			if [ "$BOARD" = "scb" ] ; then
 				KERNEL_DTB=imx6dl-var-som-vsc.dtb
-			elif [[ "$BOARD" == "symph" ]] ; then
+			elif [ "$BOARD" = "symph" ] ; then
 				KERNEL_DTB=imx6dl-var-som-symphony.dtb
 			else
 				KERNEL_DTB=imx6dl-var-som-$TOUCHSCREEN.dtb
@@ -260,15 +260,15 @@ if [[ $CPUS == 1 ]] || [[ $CPUS == 2 ]] ; then
 fi
 
 #iMX6 Dual/Quad
-if [[ $CPUS == 4 ]] ; then
-	if [[ `cat /sys/devices/soc0/soc_id` == "i.MX6QP" ]] ; then
+if [ "$CPUS" = 4 ] ; then
+	if [ `cat /sys/devices/soc0/soc_id` = "i.MX6QP" ] ; then
 		QUADTYPE="imx6qp"
 	else
 		QUADTYPE="imx6q"
 	fi
-	if [[ $BOARD == "scb" ]] ; then
+	if [ "$BOARD" = "scb" ] ; then
 		KERNEL_DTB=$QUADTYPE-var-som-vsc.dtb
-	elif [[ "$BOARD" == "symph" ]] ; then
+	elif [ "$BOARD" = "symph" ] ; then
 		KERNEL_DTB=$QUADTYPE-var-som-symphony.dtb
 	else
 		KERNEL_DTB=$QUADTYPE-var-som-$TOUCHSCREEN.dtb
@@ -278,18 +278,18 @@ fi
 printf "Installing Device Tree file: "
 blue_bold_echo $KERNEL_DTB
 
-if [[ $ROOTFS_DEV == "nand" ]] ; then
+if [ "$ROOTFS_DEV" = "nand" ] ; then
 	printf "Installing rootfs image: "
 	blue_bold_echo $ROOTFS_IMAGE
 fi
 
-if [[ $ROOTFS_DEV == "emmc" ]] && [[ $swupdate == 1 ]] ; then
+if [ "$ROOTFS_DEV" = "emmc" ] && [ "$swupdate" = 1 ] ; then
 	blue_bold_echo "Creating two rootfs partitions"
 fi
 
 install_bootloader
 
-if [[ $ROOTFS_DEV != "emmc" ]] || [[ $swupdate != 1 ]] ; then
+if [ "$ROOTFS_DEV" != "emmc" ] || [ "$swupdate" != 1 ] ; then
 	install_kernel
 fi
 

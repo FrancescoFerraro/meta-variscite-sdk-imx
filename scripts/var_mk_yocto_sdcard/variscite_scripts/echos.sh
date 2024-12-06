@@ -1,14 +1,14 @@
 blue_underlined_bold_echo()
 {
-	echo -e "\e[34m\e[4m\e[1m$@\e[0m"
+	printf '\033[34m\033[4m\033[1m%s\033[0m\n' "$@"
 }
 
 blue_bold_echo()
 {
-	echo -e "\e[34m\e[1m$@\e[0m"
+	printf '\033[34m\033[1m%s\033[0m\n' "$@"
 }
 
 red_bold_echo()
 {
-	echo -e "\e[31m\e[1m$@\e[0m"
+	printf '\033[31m\033[1m%s\033[0m\n' "$@"
 }
