@@ -2,7 +2,7 @@
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 DESCRIPTION = "Variscite bootable recovery SD card image used for installing \
-    various images on the eMMC."
+    various images on the eMMC or NAND."
 LICENSE = "MIT"
 
 # The base of the running SD recovery image defaults to fsl-image-gui.
@@ -15,15 +15,33 @@ VAR_RECOVERY_SD_IMAGE ?= "recipes-fsl/images/fsl-image-gui.bb"
 VAR_RECOVERY_TARGET_ROOTFS ?= "fsl-image-gui"
 
 
-# The recovery SD image is dependent on imx-boot components
-VAR_RECOVERY_DEPENDS = "\
-    imx-boot \
+VAR_RECOVERY_DEPENDS_IMX6_7 = "u-boot"
+VAR_RECOVERY_DEPENDS_IMX8_9 = "imx-boot"
+
+VAR_RECOVERY_DEPENDS:mx6-nxp-bsp = "${VAR_RECOVERY_DEPENDS_IMX6_7}"
+VAR_RECOVERY_DEPENDS:mx7-nxp-bsp = "${VAR_RECOVERY_DEPENDS_IMX6_7}"
+VAR_RECOVERY_DEPENDS:mx8-nxp-bsp = "${VAR_RECOVERY_DEPENDS_IMX8_9}"
+VAR_RECOVERY_DEPENDS:mx9-nxp-bsp = "${VAR_RECOVERY_DEPENDS_IMX8_9}"
+
+VAR_RECOVERY_TARGET_ROOTFS_TYPES:mx6-nxp-bsp ?= ".tar.zst _128kbpeb.ubi _256kbpeb.ubi"
+VAR_RECOVERY_TARGET_ROOTFS_TYPES:mx7-nxp-bsp ?= ".tar.zst _128kbpeb.ubi _256kbpeb.ubi"
+
+VAR_RECOVERY_IMAGES_IMX6_7 = " \
+    ${IMAGE_BOOT_FILES} \
+    SPL-nand \
+    SPL-sd \
+    u-boot.img-sd \
+    u-boot.img-nand \
 "
 
-# Package the imx-boot generated file in the SD image
-VAR_RECOVERY_IMAGES = "\
-    imx-boot \
-"
+VAR_RECOVERY_IMAGES_IMX8_9 = "imx-boot"
+
+VAR_RECOVERY_IMAGES:mx6-nxp-bsp = "${VAR_RECOVERY_IMAGES_IMX6_7}"
+VAR_RECOVERY_IMAGES:mx7-nxp-bsp = "${VAR_RECOVERY_IMAGES_IMX6_7}"
+
+VAR_RECOVERY_IMAGES:mx8-nxp-bsp = "${VAR_RECOVERY_DEPENDS_IMX8_9}"
+VAR_RECOVERY_IMAGES:mx9-nxp-bsp = "${VAR_RECOVERY_DEPENDS_IMX8_9}"
+
 # The file must then be renamed to follow the install_yocto.sh standard name.
 VAR_RECOVERY_IMAGE_RENAME[imx-boot] = "imx-boot-sd.bin"
 
@@ -35,4 +53,7 @@ IMAGE_INSTALL:append:mx8-nxp-bsp = " \
     ${@bb.utils.contains('DISTRO', 'fsl-imx-xwayland', 'var-install-android', '', d)} \
 "
 
-COMPATIBLE_MACHINE = "(mx8-nxp-bsp|mx9-nxp-bsp)"
+# var-recovery can install to NAND, but it is too big to be installed on NAND
+IMAGE_FSTYPES:remove = "multiubi"
+
+COMPATIBLE_MACHINE = "(mx6-nxp-bsp|mx7-nxp-bsp|mx8-nxp-bsp|mx9-nxp-bsp)"
