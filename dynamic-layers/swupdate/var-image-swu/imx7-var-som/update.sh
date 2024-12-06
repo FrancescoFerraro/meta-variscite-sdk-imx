@@ -4,18 +4,18 @@ if [ $# -lt 1 ]; then
 	exit 0;
 fi
 
-function get_current_root_device
+get_current_root_device()
 {
-	for i in `cat /proc/cmdline`; do
-		if [ ${i:0:5} = "root=" ]; then
-			CURRENT_ROOT="${i:5}"
-		fi
+	for i in $(cat /proc/cmdline); do
+		case "$i" in
+			root=*) CURRENT_ROOT="${i#root=}" ;;
+		esac
 	done
 }
 
-function get_update_part
+get_update_part()
 {
-	CURRENT_PART="${CURRENT_ROOT: -1}"
+	CURRENT_PART=$(printf "%s" "$CURRENT_ROOT" | tail -c 1)
 	if [ $CURRENT_PART = "1" ]; then
 		UPDATE_PART="2";
 	else
@@ -23,18 +23,18 @@ function get_update_part
 	fi
 }
 
-function get_update_device
+get_update_device()
 {
 	UPDATE_ROOT=${CURRENT_ROOT%?}${UPDATE_PART}
 }
 
-function format_update_device
+format_update_device()
 {
 	umount $UPDATE_ROOT
 	mkfs.ext4 $UPDATE_ROOT -F -L rootfs${UPDATE_PART} -q
 }
 
-if [ $1 == "preinst" ]; then
+if [ "$1" = "preinst" ]; then
 	# get the current root device
 	get_current_root_device
 
@@ -49,7 +49,7 @@ if [ $1 == "preinst" ]; then
 	ln -sf $UPDATE_ROOT /dev/update
 fi
 
-if [ $1 == "postinst" ]; then
+if [ "$1" = "postinst" ]; then
 	get_current_root_device
 
 	if [ ! -d "/sys/kernel/debug/gpmi-nand" ]; then
@@ -58,8 +58,8 @@ if [ $1 == "postinst" ]; then
 		rm /etc/u-boot-initial-env-*nand*
 		ln -sf u-boot-initial-env-sd /etc/u-boot-initial-env
 		sed -i "/mtd/ s/^#*/#/" ${TMPDIR}/datadst/etc/fw_env.config
-		CURRENT_BLK_DEV=${CURRENT_ROOT%p?}
-		sed -i "s/#*\/dev\/mmcblk./${CURRENT_BLK_DEV//\//\\/}/" ${TMPDIR}/datadst/etc/fw_env.config
+		CURRENT_BLK_DEV="${CURRENT_ROOT%p?}"
+		sed -i "s/\/dev\/mmcblk./$(echo ${CURRENT_BLK_DEV} | sed 's_/_\\/_g')/" ${TMPDIR}/datadst/etc/fw_env.config
 		umount /dev/update
 	fi
 
